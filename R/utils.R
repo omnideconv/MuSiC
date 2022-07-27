@@ -136,11 +136,11 @@ music_prop = function(bulk.eset, sc.eset, markers = NULL, clusters, samples, sel
       stop("Too few common genes!")
   }
   if(verbose){message(paste('Used', length(cm.gene), 'common genes...'))}
-  
+
   m.sc = match(cm.gene, rownames(sc.basis$Disgn.mtx)); m.bulk = match(cm.gene, bulk.gene)
-  D1 = sc.basis$Disgn.mtx[m.sc, ]; 
+  D1 = sc.basis$Disgn.mtx[m.sc, ];
   M.S = colMeans(sc.basis$S, na.rm = T);
-  
+
   if(!is.null(cell_size)){
     if(!is.data.frame(cell_size)){
       stop("cell_size paramter should be a data.frame with 1st column for cell type names and 2nd column for cell sizes")
@@ -155,17 +155,17 @@ music_prop = function(bulk.eset, sc.eset, markers = NULL, clusters, samples, sel
     M.S <- M.S[, 2]
     names(M.S) <- my_ms_names
   }
-  
-  Yjg = relative.ab(exprs(bulk.eset)[m.bulk, ]); N.bulk = ncol(bulk.eset);
+
+  Yjg = relative.ab(exprs(bulk.eset)[m.bulk, , drop = FALSE]); N.bulk = ncol(bulk.eset);
   if(ct.cov){
     Sigma.ct = sc.basis$Sigma.ct[, m.sc];
-    
+
     Est.prop.allgene = NULL
     Est.prop.weighted = NULL
     Weight.gene = NULL
     r.squared.full = NULL
     Var.prop = NULL
-    
+
     for(i in 1:N.bulk){
       if(sum(Yjg[, i] == 0) > 0){
         D1.temp = D1[Yjg[, i]!=0, ];
@@ -178,7 +178,7 @@ music_prop = function(bulk.eset, sc.eset, markers = NULL, clusters, samples, sel
         Sigma.ct.temp = Sigma.ct;
         if(verbose) message(paste(colnames(Yjg)[i], 'has common genes', sum(Yjg[, i] != 0), '...'))
       }
-      
+
       lm.D1.weighted = music.iter.ct(Yjg.temp, D1.temp, M.S, Sigma.ct.temp, iter.max = iter.max,
                                      nu = nu, eps = eps, centered = centered, normalize = normalize)
       Est.prop.allgene = rbind(Est.prop.allgene, lm.D1.weighted$p.nnls)
@@ -190,17 +190,17 @@ music_prop = function(bulk.eset, sc.eset, markers = NULL, clusters, samples, sel
     }
   }else{
     Sigma = sc.basis$Sigma[m.sc, ];
-    
+
     valid.ct = (colSums(is.na(Sigma)) == 0)&(colSums(is.na(D1)) == 0)&(!is.na(M.S))
-    
+
     if(sum(valid.ct)<=1){
       stop("Not enough valid cell type!")
     }
-    
+
     if(verbose){message(paste('Used', sum(valid.ct), 'cell types in deconvolution...' ))}
-    
+
     D1 = D1[, valid.ct]; M.S = M.S[valid.ct]; Sigma = Sigma[, valid.ct];
-    
+
     Est.prop.allgene = NULL
     Est.prop.weighted = NULL
     Weight.gene = NULL
@@ -218,7 +218,7 @@ music_prop = function(bulk.eset, sc.eset, markers = NULL, clusters, samples, sel
         Sigma.temp = Sigma;
         if(verbose) message(paste(colnames(Yjg)[i], 'has common genes', sum(Yjg[, i] != 0), '...'))
       }
-      
+
       lm.D1.weighted = music.iter(Yjg.temp, D1.temp, M.S, Sigma.temp, iter.max = iter.max,
                                   nu = nu, eps = eps, centered = centered, normalize = normalize)
       Est.prop.allgene = rbind(Est.prop.allgene, lm.D1.weighted$p.nnls)
@@ -238,7 +238,7 @@ music_prop = function(bulk.eset, sc.eset, markers = NULL, clusters, samples, sel
   rownames(Weight.gene) = cm.gene
   colnames(Var.prop) = colnames(D1)
   rownames(Var.prop) = colnames(Yjg)
-  
+
   return(list(Est.prop.weighted = Est.prop.weighted, Est.prop.allgene = Est.prop.allgene,
               Weight.gene = Weight.gene, r.squared.full = r.squared.full, Var.prop = Var.prop))
 }
@@ -249,7 +249,7 @@ music_prop = function(bulk.eset, sc.eset, markers = NULL, clusters, samples, sel
 #'
 #' @param bulk.eset ExpressionSet for bulk data
 #' @param sc.eset ExpressionSet for single cell data
-#' @param group.markers list of gene names. The list include differential expressed genes within groups. 
+#' @param group.markers list of gene names. The list include differential expressed genes within groups.
 #'        List name must be the same as `clusters.type`.
 #' @param groups character, the phenoData of single cell data used as groups;
 #' @param clusters character, the phenoData of single cell dataset used as clusters;
@@ -270,41 +270,41 @@ music_prop.cluster = function(bulk.eset, sc.eset, group.markers, groups, cluster
   bulk.gene = rownames(bulk.eset)[rowMeans(exprs(bulk.eset)) != 0]
   bulk.eset = bulk.eset[bulk.gene, , drop = FALSE]
   select.ct = unlist(clusters.type)
-  
+
   if(length(setdiff(names(group.markers), names(clusters.type))) > 0 || length(setdiff(names(clusters.type), names(group.markers))) > 0){
     stop("Cluster number is not matching!")
   }else{
     group.markers = group.markers[names(clusters.type)]
   }
-  
-  
+
+
   if(verbose){message('Start: cluster estimations...')}
   cluster.sc.basis = music_basis(sc.eset, non.zero = TRUE, markers = NULL, clusters = groups, samples = samples, select.ct = names(clusters.type), verbose = verbose)
   if(verbose){message('Start: cell type estimations...')}
   sc.basis = music_basis(sc.eset, non.zero = TRUE, markers = NULL, clusters = clusters, samples = samples, select.ct = select.ct, verbose = verbose)
   cm.gene = intersect(rownames(sc.basis$Disgn.mtx), bulk.gene)
-  
+
   if(length(cm.gene)< 0.2*min(length(bulk.gene), nrow(sc.eset)) ){
     stop("Too few common genes!")
   }
-  
+
   if(verbose){message(paste('Used', length(cm.gene), 'common genes...'))}
-  
+
   m.sc = match(cm.gene, rownames(sc.basis$Disgn.mtx)); m.bulk = match(cm.gene, bulk.gene)
   group.markers = lapply(group.markers, intersect, cm.gene)
-  
+
   D1 = sc.basis$Disgn.mtx[m.sc,]; M.S = sc.basis$M.S; Sigma = sc.basis$Sigma[m.sc, ]
-  
+
   cluster.select = setdiff(rownames(D1), unique(unlist(group.markers)))
   cluster.diff = unique(unlist(group.markers))
-  
+
   D1.cluster = cluster.sc.basis$Disgn.mtx[cluster.select, ]; M.S.cluster = cluster.sc.basis$M.S;
-  Yjg = relative.ab(exprs(bulk.eset)[m.bulk, ]); N.bulk = ncol(bulk.eset);
-  
+  Yjg = relative.ab(exprs(bulk.eset)[m.bulk, , drop = FALSE]); N.bulk = ncol(bulk.eset);
+
   Sigma.cluster = cluster.sc.basis$Sigma[cluster.select, ];
-  
+
   D1.sub = cluster.sc.basis$Disgn.mtx[cluster.diff, ]; Sigma.sub = cluster.sc.basis$Sigma[cluster.diff, ];
-  
+
   Est.prop.weighted.cluster = NULL
   for(i in 1:N.bulk){
     if(sum(Yjg[, i] == 0) > 0){
@@ -347,10 +347,10 @@ music_prop.cluster = function(bulk.eset, sc.eset, group.markers, groups, cluster
     }
     Est.prop.weighted.cluster = rbind(Est.prop.weighted.cluster, p.weight)
   }
-  
+
   colnames(Est.prop.weighted.cluster) = unlist(clusters.type)
   rownames(Est.prop.weighted.cluster) = colnames(Yjg)
-  
+
   return(list(Est.prop.weighted.cluster = Est.prop.weighted.cluster))
 }
 
@@ -390,7 +390,7 @@ Anova_info = function(eset, non.zero = TRUE, markers = NULL, clusters, samples, 
     eset <- eset[unlist(markers), , drop = FALSE]
     message(paste('Selected', length(unlist(markers)), 'marker gene(s) ...' ))
   }
-  
+
   exprs(eset) = log( relative.ab(exprs(eset))+10^{-10} ) #change counts to relative abundance
   message('Transform counts to log scaled relative abundance ...')
   clusters <- as.character(pData(eset)[ , clusters])
@@ -405,7 +405,7 @@ Anova_info = function(eset, non.zero = TRUE, markers = NULL, clusters, samples, 
     marker.data = data.frame(log.RA = exprs(eset)[i, ], indv = samples, cell.type = clusters)
     s.aov = unlist(summary(aov(log.RA ~ indv*cell.type, data = marker.data)))[13:15]
     f.indv = c(f.indv, s.aov[1]); f.cell.type = c(f.cell.type, s.aov[2]); f.inter = c(f.inter, s.aov[3])
-    
+
     for(k in 1:length(cell.type.select)){
       marker.data.1ct = marker.data;
       cell.type.1ct = rep(cell.type.select[k], ncol(eset));
