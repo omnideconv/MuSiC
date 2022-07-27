@@ -9,7 +9,7 @@ License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.3.2), nnls (>= 1.4), ggplot2 (>= 2.2.1), Biobase
-Imports: 
+Imports:Biobase, 
         plyr,
         MCMCpack
 URL: https://github.com/xuranw/MuSiC

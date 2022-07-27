@@ -29,18 +29,18 @@ bulk_construct = function(eset, clusters, samples, select.ct = NULL){
   })
   bulk.counts = t(data.matrix(rdf[,-1]))
   colnames(bulk.counts) = rdf[,1]
-  
+
   ctdf = ddply(mdf, samples, function(x){
     summary(x[, clusters])
   })
   num.real = ctdf[, -1]
   rownames(num.real) = ctdf[, 1]
-  
-  
+
+
   bulk.pData = ddply(mdf, samples, function(x){
     x[1, setdiff(colnames(x), c(clusters, samples,'index')) ]
   })
-  
+
   rownames(bulk.pData) = bulk.pData[, 1]
   metadata <- data.frame(labelDescription= colnames(bulk.pData), row.names= colnames(bulk.pData) )
   Bulk.counts = ExpressionSet(assayData = bulk.counts, phenoData = new("AnnotatedDataFrame", data = bulk.pData, varMetadata = metadata))
@@ -72,7 +72,7 @@ music_M.theta = function(x, non.zero, markers, clusters, samples, select.ct){
     nz.gene = rownames(x)[( rowSums(exprs(x)) != 0 )]
     x <- x[nz.gene, , drop = FALSE]
   }
-  
+
   clusters <- as.character(pData(x)[, clusters])
   samples <- as.character(pData(x)[, samples])
   M.theta <- sapply(unique(clusters), function(ct){
@@ -81,12 +81,12 @@ music_M.theta = function(x, non.zero, markers, clusters, samples, select.ct){
       rowSums(y)/sum(y)
     }), na.rm = TRUE)
   })
-  
+
   if(!is.null(select.ct)){
     m.ct = match(select.ct, colnames(M.theta))
     M.theta = M.theta[, m.ct]
   }
-  
+
   if (!is.null(markers)){
     ids <- intersect(unlist(markers), rownames(x))
     m.ids = match(ids, rownames(x))
@@ -118,7 +118,7 @@ music_Theta <- function(x, non.zero = FALSE, clusters, samples, select.ct = NULL
     x <- x[nz.gene, , drop = FALSE]
   }
   nGenes = nrow(x);
-  
+
   clusters <- as.character(pData(x)[, clusters])
   samples <- as.character(pData(x)[, samples])
   Theta <- sapply(unique(clusters), function(ct){
@@ -133,7 +133,7 @@ music_Theta <- function(x, non.zero = FALSE, clusters, samples, select.ct = NULL
     Theta = Theta[, m.ct]
     n.ct = length(select.ct)
   }
-  
+
   return(Theta = Theta)
 }
 
@@ -160,7 +160,7 @@ music_Sigma.ct = function(x, non.zero, markers, clusters, samples, select.ct){
     x <- x[nz.gene, , drop = FALSE]
   }
   nGenes = nrow(x);
-  
+
   clusters <- as.character(pData(x)[, clusters])
   samples <- as.character(pData(x)[, samples])
   Sigma <- sapply(unique(clusters), function(ct){
@@ -206,7 +206,7 @@ music_Sigma = function(x, non.zero, markers, clusters, samples, select.ct){
     nz.gene = rownames(x)[( rowSums(exprs(x)) != 0 )]
     x <- x[nz.gene, , drop = FALSE]
   }
-  
+
   clusters <- as.character(pData(x)[, clusters])
   samples <- as.character(pData(x)[, samples])
   Sigma <- sapply(unique(clusters), function(ct){
@@ -215,12 +215,12 @@ music_Sigma = function(x, non.zero, markers, clusters, samples, select.ct){
       rowSums(y)/sum(y)
     }), 1, var, na.rm = TRUE)
   })
-  
+
   if(!is.null(select.ct)){
     m.ct = match(select.ct, colnames(Sigma))
     Sigma = Sigma[, m.ct]
   }
-  
+
   if (!is.null(markers)){
     ids <- intersect(unlist(markers), rownames(x))
     m.ids = match(ids, rownames(x))
@@ -250,10 +250,10 @@ music_S = function(x, non.zero, clusters, samples, select.ct){
     nz.gene = rownames(x)[( rowSums(exprs(x)) != 0 )]
     x <- x[nz.gene, , drop = FALSE]
   }
-  
+
   clusters <- as.character(pData(x)[, clusters])
   samples <- as.character(pData(x)[, samples])
-  
+
   S <- sapply(unique(clusters), function(ct){
     my.rowMeans(sapply(unique(samples), function(sid){
       y = exprs(x)[, clusters %in% ct & samples %in% sid, drop = FALSE]
@@ -262,7 +262,7 @@ music_S = function(x, non.zero, clusters, samples, select.ct){
   })
   S[S == 0] = NA
   M.S = colMeans(S, na.rm = TRUE)
-  
+
   if(!is.null(select.ct)){
     m.ct = match(select.ct, colnames(S))
     S = S[, m.ct]
@@ -316,6 +316,8 @@ music_Design.matrix = function(x, non.zero, markers, clusters, samples, select.c
 #'     * gene by celltype matrix of average relative abundance
 #'     * gene by celltype matrix of cross-subject variation
 #'
+#' @import Biobase
+#'
 #' @export
 music_basis = function(x, non.zero = TRUE, markers = NULL, clusters, samples, select.ct = NULL, cell_size = NULL, ct.cov = FALSE, verbose = TRUE){
   if(!is.null(select.ct)){
@@ -326,10 +328,10 @@ music_basis = function(x, non.zero = TRUE, markers = NULL, clusters, samples, se
     nz.gene = rownames(x)[( rowSums(exprs(x)) != 0 )]
     x <- x[nz.gene, , drop = FALSE]
   }
-  
+
   clusters <- as.character(pData(x)[, clusters])
   samples <- as.character(pData(x)[, samples])
-  
+
   M.theta <- sapply(unique(clusters), function(ct){
     my.rowMeans(sapply(unique(samples), function(sid){
       y = exprs(x)[,clusters %in% ct & samples %in% sid, drop = FALSE]
@@ -341,7 +343,7 @@ music_basis = function(x, non.zero = TRUE, markers = NULL, clusters, samples, se
     nGenes = nrow(x);
     n.ct = length(unique(clusters));
     nSubs = length(unique(samples))
-    
+
     Theta <- sapply(unique(clusters), function(ct){
       sapply(unique(samples), function(sid){
         y = exprs(x)[,clusters %in% ct & samples %in% sid, drop = FALSE]
@@ -352,7 +354,7 @@ music_basis = function(x, non.zero = TRUE, markers = NULL, clusters, samples, se
       m.ct = match(select.ct, colnames(Theta))
       Theta = Theta[, m.ct]
     }
-    
+
     Sigma.ct = sapply(1:nGenes, function(g){
       sigma.temp = Theta[nGenes*(0:(nSubs - 1)) + g, ];
       Cov.temp = cov(sigma.temp)
@@ -362,7 +364,7 @@ music_basis = function(x, non.zero = TRUE, markers = NULL, clusters, samples, se
       return(Cov.temp)
     })
     colnames(Sigma.ct) = rownames(x);
-    
+
     if (!is.null(markers)){
       ids <- intersect(unlist(markers), rownames(x))
       m.ids = match(ids, rownames(x))
@@ -380,7 +382,7 @@ music_basis = function(x, non.zero = TRUE, markers = NULL, clusters, samples, se
       m.ct = match(select.ct, colnames(Sigma))
       Sigma = Sigma[, m.ct]
     }
-    
+
     if (!is.null(markers)){
       ids <- intersect(unlist(markers), rownames(x))
       m.ids = match(ids, rownames(x))
@@ -388,7 +390,7 @@ music_basis = function(x, non.zero = TRUE, markers = NULL, clusters, samples, se
     }
     if(verbose){message("Creating Variance Matrix...")}
   }
-  
+
   S <- sapply(unique(clusters), function(ct){
     my.rowMeans(sapply(unique(samples), function(sid){
       y = exprs(x)[, clusters %in% ct & samples %in% sid, drop = FALSE]
@@ -396,14 +398,14 @@ music_basis = function(x, non.zero = TRUE, markers = NULL, clusters, samples, se
     }), na.rm = TRUE)
   })
   if(verbose){message("Creating Library Size Matrix...")}
-  
+
   S[S == 0] = NA
   M.S = colMeans(S, na.rm = TRUE)
   #S.ra = relative.ab(S, by.col = FALSE)
   #S.ra[S.ra == 0] = NA
   #S[S == 0] = NA
   #M.S = mean(S, na.rm = TRUE)*ncol(S)*colMeans(S.ra, na.rm = TRUE)
-  
+
   if(!is.null(cell_size)){
     if(!is.data.frame(cell_size)){
       stop("cell_size paramter should be a data.frame with 1st column for cell type names and 2nd column for cell sizes")
@@ -418,9 +420,9 @@ music_basis = function(x, non.zero = TRUE, markers = NULL, clusters, samples, se
     M.S <- M.S[, 2]
     names(M.S) <- my_ms_names
   }
-  
+
   D <- t(t(M.theta)*M.S)
-  
+
   if(!is.null(select.ct)){
     m.ct = match(select.ct, colnames(D))
     D = D[, m.ct]
@@ -428,14 +430,14 @@ music_basis = function(x, non.zero = TRUE, markers = NULL, clusters, samples, se
     M.S = M.S[m.ct]
     M.theta = M.theta[, m.ct]
   }
-  
+
   if (!is.null(markers)){
     ids <- intersect(unlist(markers), rownames(x))
     m.ids = match(ids, rownames(x))
     D <- D[m.ids, ]
     M.theta <- M.theta[m.ids, ]
   }
-  
+
   if(ct.cov){
     return(list(Disgn.mtx = D, S = S, M.S = M.S, M.theta = M.theta, Sigma.ct = Sigma.ct))
   }else{
