@@ -316,7 +316,7 @@ music_Design.matrix = function(x, non.zero, markers, clusters, samples, select.c
 #'     * gene by celltype matrix of average relative abundance
 #'     * gene by celltype matrix of cross-subject variation
 #'
-#' @import Biobase
+#' @importFrom Biobase exprs pData
 #'
 #' @export
 music_basis = function(x, non.zero = TRUE, markers = NULL, clusters, samples, select.ct = NULL, cell_size = NULL, ct.cov = FALSE, verbose = TRUE){
