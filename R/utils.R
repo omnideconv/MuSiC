@@ -119,7 +119,7 @@ get_upper_tri = function(cormat){
 #' @export
 music_prop = function(bulk.eset, sc.eset, markers = NULL, clusters, samples, select.ct = NULL, cell_size = NULL, ct.cov = FALSE, verbose = TRUE,
                       iter.max = 1000, nu = 0.0001, eps = 0.01, centered = FALSE, normalize = FALSE, ... ){
-  bulk.gene = rownames(bulk.eset)[rowMeans(exprs(bulk.eset)) != 0]
+  bulk.gene = rownames(bulk.eset)[rowMeans(Biobase::exprs(bulk.eset)) != 0]
   bulk.eset = bulk.eset[bulk.gene, , drop = FALSE]
   if(is.null(markers)){
     sc.markers = bulk.gene
@@ -156,7 +156,7 @@ music_prop = function(bulk.eset, sc.eset, markers = NULL, clusters, samples, sel
     names(M.S) <- my_ms_names
   }
 
-  Yjg = relative.ab(exprs(bulk.eset)[m.bulk, , drop = FALSE]); N.bulk = ncol(bulk.eset);
+  Yjg = relative.ab(Biobase::exprs(bulk.eset)[m.bulk, , drop = FALSE]); N.bulk = ncol(bulk.eset);
   if(ct.cov){
     Sigma.ct = sc.basis$Sigma.ct[, m.sc];
 
@@ -267,7 +267,7 @@ music_prop = function(bulk.eset, sc.eset, markers = NULL, clusters, samples, sel
 #' @export
 music_prop.cluster = function(bulk.eset, sc.eset, group.markers, groups, clusters, samples, clusters.type,
                               verbose = TRUE, iter.max = 1000, nu = 0.0001, eps = 0.01, centered = FALSE, normalize = FALSE, ... ){
-  bulk.gene = rownames(bulk.eset)[rowMeans(exprs(bulk.eset)) != 0]
+  bulk.gene = rownames(bulk.eset)[rowMeans(Biobase::exprs(bulk.eset)) != 0]
   bulk.eset = bulk.eset[bulk.gene, , drop = FALSE]
   select.ct = unlist(clusters.type)
 
@@ -299,7 +299,7 @@ music_prop.cluster = function(bulk.eset, sc.eset, group.markers, groups, cluster
   cluster.diff = unique(unlist(group.markers))
 
   D1.cluster = cluster.sc.basis$Disgn.mtx[cluster.select, ]; M.S.cluster = cluster.sc.basis$M.S;
-  Yjg = relative.ab(exprs(bulk.eset)[m.bulk, , drop = FALSE]); N.bulk = ncol(bulk.eset);
+  Yjg = relative.ab(Biobase::exprs(bulk.eset)[m.bulk, , drop = FALSE]); N.bulk = ncol(bulk.eset);
 
   Sigma.cluster = cluster.sc.basis$Sigma[cluster.select, ];
 
@@ -382,7 +382,7 @@ Anova_info = function(eset, non.zero = TRUE, markers = NULL, clusters, samples, 
     message(paste('Selected', length(select.ct), 'cell type(s) ...' ))
   }
   if(non.zero){  ## eliminate non expressed genes
-    nz.gene = rownames(eset)[( rowSums(exprs(eset)) != 0 )]
+    nz.gene = rownames(eset)[( rowSums(Biobase::exprs(eset)) != 0 )]
     eset <- eset[nz.gene, , drop = FALSE]
     message(paste('Eliminating non expressed gene(s) ...' ))
   }
@@ -391,7 +391,7 @@ Anova_info = function(eset, non.zero = TRUE, markers = NULL, clusters, samples, 
     message(paste('Selected', length(unlist(markers)), 'marker gene(s) ...' ))
   }
 
-  exprs(eset) = log( relative.ab(exprs(eset))+10^{-10} ) #change counts to relative abundance
+  Biobase::exprs(eset) = log( relative.ab(Biobase::exprs(eset))+10^{-10} ) #change counts to relative abundance
   message('Transform counts to log scaled relative abundance ...')
   clusters <- as.character(pData(eset)[ , clusters])
   samples <- as.character(pData(eset)[ , samples])
@@ -402,7 +402,7 @@ Anova_info = function(eset, non.zero = TRUE, markers = NULL, clusters, samples, 
   F.indv = NULL; F.cell.type = NULL; F.inter = NULL;
   for(i in 1:nrow(eset)){
     f.indv = NULL; f.cell.type = NULL; f.inter = NULL;
-    marker.data = data.frame(log.RA = exprs(eset)[i, ], indv = samples, cell.type = clusters)
+    marker.data = data.frame(log.RA = Biobase::exprs(eset)[i, ], indv = samples, cell.type = clusters)
     s.aov = unlist(summary(aov(log.RA ~ indv*cell.type, data = marker.data)))[13:15]
     f.indv = c(f.indv, s.aov[1]); f.cell.type = c(f.cell.type, s.aov[2]); f.inter = c(f.inter, s.aov[3])
 

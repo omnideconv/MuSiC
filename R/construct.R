@@ -25,7 +25,7 @@ bulk_construct = function(eset, clusters, samples, select.ct = NULL){
   mdf = pData(eset)
   mdf$index = 1:ncol(eset);
   rdf <-ddply(mdf, samples, function(x){
-    rowSums(exprs(eset[, x$index]) )
+    rowSums(Biobase::exprs(eset[, x$index]) )
   })
   bulk.counts = t(data.matrix(rdf[,-1]))
   colnames(bulk.counts) = rdf[,1]
@@ -69,7 +69,7 @@ music_M.theta = function(x, non.zero, markers, clusters, samples, select.ct){
     x <- x[, s.ct, drop = FALSE]
   }
   if(non.zero){  ## eliminate non expressed genes
-    nz.gene = rownames(x)[( rowSums(exprs(x)) != 0 )]
+    nz.gene = rownames(x)[( rowSums(Biobase::exprs(x)) != 0 )]
     x <- x[nz.gene, , drop = FALSE]
   }
 
@@ -77,7 +77,7 @@ music_M.theta = function(x, non.zero, markers, clusters, samples, select.ct){
   samples <- as.character(pData(x)[, samples])
   M.theta <- sapply(unique(clusters), function(ct){
     my.rowMeans(sapply(unique(samples), function(sid){
-      y = exprs(x)[,clusters %in% ct & samples %in% sid, drop = FALSE]
+      y = Biobase::exprs(x)[,clusters %in% ct & samples %in% sid, drop = FALSE]
       rowSums(y)/sum(y)
     }), na.rm = TRUE)
   })
@@ -114,7 +114,7 @@ music_Theta <- function(x, non.zero = FALSE, clusters, samples, select.ct = NULL
     x <- x[, s.ct, drop = FALSE]
   }
   if(non.zero){
-    nz.gene = rownames(x)[(rowSums(exprs(x)) != 0)]
+    nz.gene = rownames(x)[(rowSums(Biobase::exprs(x)) != 0)]
     x <- x[nz.gene, , drop = FALSE]
   }
   nGenes = nrow(x);
@@ -123,7 +123,7 @@ music_Theta <- function(x, non.zero = FALSE, clusters, samples, select.ct = NULL
   samples <- as.character(pData(x)[, samples])
   Theta <- sapply(unique(clusters), function(ct){
     sapply(unique(samples), function(sid){
-      y = exprs(x)[,clusters %in% ct & samples %in% sid, drop = FALSE]
+      y = Biobase::exprs(x)[,clusters %in% ct & samples %in% sid, drop = FALSE]
       rowSums(y)/sum(y)
     })
   })
@@ -156,7 +156,7 @@ music_Sigma.ct = function(x, non.zero, markers, clusters, samples, select.ct){
     x <- x[, s.ct, drop = FALSE]
   }
   if(non.zero){  ## eliminate non expressed genes
-    nz.gene = rownames(x)[( rowSums(exprs(x)) != 0 )]
+    nz.gene = rownames(x)[( rowSums(Biobase::exprs(x)) != 0 )]
     x <- x[nz.gene, , drop = FALSE]
   }
   nGenes = nrow(x);
@@ -165,7 +165,7 @@ music_Sigma.ct = function(x, non.zero, markers, clusters, samples, select.ct){
   samples <- as.character(pData(x)[, samples])
   Sigma <- sapply(unique(clusters), function(ct){
     sapply(unique(samples), function(sid){
-      y = exprs(x)[,clusters %in% ct & samples %in% sid, drop = FALSE]
+      y = Biobase::exprs(x)[,clusters %in% ct & samples %in% sid, drop = FALSE]
       rowSums(y)/sum(y)
     })
   })
@@ -203,7 +203,7 @@ music_Sigma = function(x, non.zero, markers, clusters, samples, select.ct){
     x <- x[, s.ct, drop = FALSE]
   }
   if(non.zero){  ## eliminate non expressed genes
-    nz.gene = rownames(x)[( rowSums(exprs(x)) != 0 )]
+    nz.gene = rownames(x)[( rowSums(Biobase::exprs(x)) != 0 )]
     x <- x[nz.gene, , drop = FALSE]
   }
 
@@ -211,7 +211,7 @@ music_Sigma = function(x, non.zero, markers, clusters, samples, select.ct){
   samples <- as.character(pData(x)[, samples])
   Sigma <- sapply(unique(clusters), function(ct){
     apply(sapply(unique(samples), function(sid){
-      y = exprs(x)[,clusters %in% ct & samples %in% sid, drop = FALSE]
+      y = Biobase::exprs(x)[,clusters %in% ct & samples %in% sid, drop = FALSE]
       rowSums(y)/sum(y)
     }), 1, var, na.rm = TRUE)
   })
@@ -247,7 +247,7 @@ music_S = function(x, non.zero, clusters, samples, select.ct){
     x <- x[, s.ct, drop = FALSE]
   }
   if(non.zero){  ## eliminate non expressed genes
-    nz.gene = rownames(x)[( rowSums(exprs(x)) != 0 )]
+    nz.gene = rownames(x)[( rowSums(Biobase::exprs(x)) != 0 )]
     x <- x[nz.gene, , drop = FALSE]
   }
 
@@ -256,7 +256,7 @@ music_S = function(x, non.zero, clusters, samples, select.ct){
 
   S <- sapply(unique(clusters), function(ct){
     my.rowMeans(sapply(unique(samples), function(sid){
-      y = exprs(x)[, clusters %in% ct & samples %in% sid, drop = FALSE]
+      y = Biobase::exprs(x)[, clusters %in% ct & samples %in% sid, drop = FALSE]
       sum(y)/ncol(y)
     }), na.rm = TRUE)
   })
@@ -325,7 +325,7 @@ music_basis = function(x, non.zero = TRUE, markers = NULL, clusters, samples, se
     x <- x[, s.ct, drop = FALSE]
   }
   if(non.zero){  ## eliminate non expressed genes
-    nz.gene = rownames(x)[( rowSums(exprs(x)) != 0 )]
+    nz.gene = rownames(x)[( rowSums(Biobase::exprs(x)) != 0 )]
     x <- x[nz.gene, , drop = FALSE]
   }
 
@@ -334,7 +334,7 @@ music_basis = function(x, non.zero = TRUE, markers = NULL, clusters, samples, se
 
   M.theta <- sapply(unique(clusters), function(ct){
     my.rowMeans(sapply(unique(samples), function(sid){
-      y = exprs(x)[,clusters %in% ct & samples %in% sid, drop = FALSE]
+      y = Biobase::exprs(x)[,clusters %in% ct & samples %in% sid, drop = FALSE]
       rowSums(y)/sum(y)
     }), na.rm = TRUE)
   })
@@ -346,7 +346,7 @@ music_basis = function(x, non.zero = TRUE, markers = NULL, clusters, samples, se
 
     Theta <- sapply(unique(clusters), function(ct){
       sapply(unique(samples), function(sid){
-        y = exprs(x)[,clusters %in% ct & samples %in% sid, drop = FALSE]
+        y = Biobase::exprs(x)[,clusters %in% ct & samples %in% sid, drop = FALSE]
         return( rowSums(y)/sum(y) )
       })
     })
@@ -374,7 +374,7 @@ music_basis = function(x, non.zero = TRUE, markers = NULL, clusters, samples, se
   }else{
     Sigma <- sapply(unique(clusters), function(ct){
       apply(sapply(unique(samples), function(sid){
-        y = exprs(x)[,clusters %in% ct & samples %in% sid, drop = FALSE]
+        y = Biobase::exprs(x)[,clusters %in% ct & samples %in% sid, drop = FALSE]
         rowSums(y)/sum(y)
       }), 1, var, na.rm = TRUE)
     })
@@ -393,7 +393,7 @@ music_basis = function(x, non.zero = TRUE, markers = NULL, clusters, samples, se
 
   S <- sapply(unique(clusters), function(ct){
     my.rowMeans(sapply(unique(samples), function(sid){
-      y = exprs(x)[, clusters %in% ct & samples %in% sid, drop = FALSE]
+      y = Biobase::exprs(x)[, clusters %in% ct & samples %in% sid, drop = FALSE]
       sum(y)/ncol(y)
     }), na.rm = TRUE)
   })
