@@ -377,7 +377,7 @@ music_prop.cluster = function(bulk.eset, sc.eset, group.markers, groups, cluster
 #' @export
 Anova_info = function(eset, non.zero = TRUE, markers = NULL, clusters, samples, select.ct = NULL, num.info = 25, ... ){
   if(!is.null(select.ct)){
-    s.ct = sampleNames(eset)[as.character(pData(eset)[ , clusters]) %in% select.ct]
+    s.ct = sampleNames(eset)[as.character(Biobase::pData(eset)[ , clusters]) %in% select.ct]
     eset <- eset[, s.ct, drop = FALSE]
     message(paste('Selected', length(select.ct), 'cell type(s) ...' ))
   }
@@ -393,9 +393,9 @@ Anova_info = function(eset, non.zero = TRUE, markers = NULL, clusters, samples, 
 
   Biobase::exprs(eset) = log( relative.ab(Biobase::exprs(eset))+10^{-10} ) #change counts to relative abundance
   message('Transform counts to log scaled relative abundance ...')
-  clusters <- as.character(pData(eset)[ , clusters])
-  samples <- as.character(pData(eset)[ , samples])
-  cell.type.select = unique(as.character(pData(eset)[ , clusters]))
+  clusters <- as.character(Biobase::pData(eset)[ , clusters])
+  samples <- as.character(Biobase::pData(eset)[ , samples])
+  cell.type.select = unique(as.character(Biobase::pData(eset)[ , clusters]))
   ngene = nrow(eset);
   j = 1
   #message(paste0('Selected ', length(cell.type.select), ' cell type(s) ...'))

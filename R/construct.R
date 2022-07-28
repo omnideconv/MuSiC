@@ -19,10 +19,10 @@
 #' @export
 bulk_construct = function(eset, clusters, samples, select.ct = NULL){
   if(!is.null(select.ct)){
-    s.ct = sampleNames(eset)[as.character(pData(eset)[, clusters]) %in% select.ct]
+    s.ct = sampleNames(eset)[as.character(Biobase::pData(eset)[, clusters]) %in% select.ct]
     eset <- eset[, s.ct, drop = FALSE]
   }
-  mdf = pData(eset)
+  mdf = Biobase::pData(eset)
   mdf$index = 1:ncol(eset);
   rdf <-ddply(mdf, samples, function(x){
     rowSums(Biobase::exprs(eset[, x$index]) )
@@ -65,7 +65,7 @@ bulk_construct = function(eset, clusters, samples, select.ct = NULL){
 #' @export
 music_M.theta = function(x, non.zero, markers, clusters, samples, select.ct){
   if(!is.null(select.ct)){
-    s.ct = sampleNames(x)[as.character(pData(x)[, clusters]) %in% select.ct]
+    s.ct = sampleNames(x)[as.character(Biobase::pData(x)[, clusters]) %in% select.ct]
     x <- x[, s.ct, drop = FALSE]
   }
   if(non.zero){  ## eliminate non expressed genes
@@ -73,8 +73,8 @@ music_M.theta = function(x, non.zero, markers, clusters, samples, select.ct){
     x <- x[nz.gene, , drop = FALSE]
   }
 
-  clusters <- as.character(pData(x)[, clusters])
-  samples <- as.character(pData(x)[, samples])
+  clusters <- as.character(Biobase::pData(x)[, clusters])
+  samples <- as.character(Biobase::pData(x)[, samples])
   M.theta <- sapply(unique(clusters), function(ct){
     my.rowMeans(sapply(unique(samples), function(sid){
       y = Biobase::exprs(x)[,clusters %in% ct & samples %in% sid, drop = FALSE]
@@ -110,7 +110,7 @@ music_M.theta = function(x, non.zero, markers, clusters, samples, select.ct){
 #' @export
 music_Theta <- function(x, non.zero = FALSE, clusters, samples, select.ct = NULL){
   if(!is.null(select.ct)){
-    s.ct = sampleNames(x)[as.character(pData(x)[, clusters]) %in% select.ct]
+    s.ct = sampleNames(x)[as.character(Biobase::pData(x)[, clusters]) %in% select.ct]
     x <- x[, s.ct, drop = FALSE]
   }
   if(non.zero){
@@ -119,8 +119,8 @@ music_Theta <- function(x, non.zero = FALSE, clusters, samples, select.ct = NULL
   }
   nGenes = nrow(x);
 
-  clusters <- as.character(pData(x)[, clusters])
-  samples <- as.character(pData(x)[, samples])
+  clusters <- as.character(Biobase::pData(x)[, clusters])
+  samples <- as.character(Biobase::pData(x)[, samples])
   Theta <- sapply(unique(clusters), function(ct){
     sapply(unique(samples), function(sid){
       y = Biobase::exprs(x)[,clusters %in% ct & samples %in% sid, drop = FALSE]
@@ -152,7 +152,7 @@ music_Theta <- function(x, non.zero = FALSE, clusters, samples, select.ct = NULL
 #' @export
 music_Sigma.ct = function(x, non.zero, markers, clusters, samples, select.ct){
   if(!is.null(select.ct)){
-    s.ct = sampleNames(x)[as.character(pData(x)[, clusters]) %in% select.ct]
+    s.ct = sampleNames(x)[as.character(Biobase::pData(x)[, clusters]) %in% select.ct]
     x <- x[, s.ct, drop = FALSE]
   }
   if(non.zero){  ## eliminate non expressed genes
@@ -161,8 +161,8 @@ music_Sigma.ct = function(x, non.zero, markers, clusters, samples, select.ct){
   }
   nGenes = nrow(x);
 
-  clusters <- as.character(pData(x)[, clusters])
-  samples <- as.character(pData(x)[, samples])
+  clusters <- as.character(Biobase::pData(x)[, clusters])
+  samples <- as.character(Biobase::pData(x)[, samples])
   Sigma <- sapply(unique(clusters), function(ct){
     sapply(unique(samples), function(sid){
       y = Biobase::exprs(x)[,clusters %in% ct & samples %in% sid, drop = FALSE]
@@ -199,7 +199,7 @@ music_Sigma.ct = function(x, non.zero, markers, clusters, samples, select.ct){
 #' @export
 music_Sigma = function(x, non.zero, markers, clusters, samples, select.ct){
   if(!is.null(select.ct)){
-    s.ct = sampleNames(x)[as.character(pData(x)[, clusters]) %in% select.ct]
+    s.ct = sampleNames(x)[as.character(Biobase::pData(x)[, clusters]) %in% select.ct]
     x <- x[, s.ct, drop = FALSE]
   }
   if(non.zero){  ## eliminate non expressed genes
@@ -207,8 +207,8 @@ music_Sigma = function(x, non.zero, markers, clusters, samples, select.ct){
     x <- x[nz.gene, , drop = FALSE]
   }
 
-  clusters <- as.character(pData(x)[, clusters])
-  samples <- as.character(pData(x)[, samples])
+  clusters <- as.character(Biobase::pData(x)[, clusters])
+  samples <- as.character(Biobase::pData(x)[, samples])
   Sigma <- sapply(unique(clusters), function(ct){
     apply(sapply(unique(samples), function(sid){
       y = Biobase::exprs(x)[,clusters %in% ct & samples %in% sid, drop = FALSE]
@@ -243,7 +243,7 @@ music_Sigma = function(x, non.zero, markers, clusters, samples, select.ct){
 #' @export
 music_S = function(x, non.zero, clusters, samples, select.ct){
   if(!is.null(select.ct)){
-    s.ct = sampleNames(x)[as.character(pData(x)[, clusters]) %in% select.ct]
+    s.ct = sampleNames(x)[as.character(Biobase::pData(x)[, clusters]) %in% select.ct]
     x <- x[, s.ct, drop = FALSE]
   }
   if(non.zero){  ## eliminate non expressed genes
@@ -251,8 +251,8 @@ music_S = function(x, non.zero, clusters, samples, select.ct){
     x <- x[nz.gene, , drop = FALSE]
   }
 
-  clusters <- as.character(pData(x)[, clusters])
-  samples <- as.character(pData(x)[, samples])
+  clusters <- as.character(Biobase::pData(x)[, clusters])
+  samples <- as.character(Biobase::pData(x)[, samples])
 
   S <- sapply(unique(clusters), function(ct){
     my.rowMeans(sapply(unique(samples), function(sid){
@@ -321,7 +321,7 @@ music_Design.matrix = function(x, non.zero, markers, clusters, samples, select.c
 #' @export
 music_basis = function(x, non.zero = TRUE, markers = NULL, clusters, samples, select.ct = NULL, cell_size = NULL, ct.cov = FALSE, verbose = TRUE){
   if(!is.null(select.ct)){
-    s.ct = sampleNames(x)[as.character(pData(x)[, clusters]) %in% select.ct]
+    s.ct = sampleNames(x)[as.character(Biobase::pData(x)[, clusters]) %in% select.ct]
     x <- x[, s.ct, drop = FALSE]
   }
   if(non.zero){  ## eliminate non expressed genes
@@ -329,8 +329,8 @@ music_basis = function(x, non.zero = TRUE, markers = NULL, clusters, samples, se
     x <- x[nz.gene, , drop = FALSE]
   }
 
-  clusters <- as.character(pData(x)[, clusters])
-  samples <- as.character(pData(x)[, samples])
+  clusters <- as.character(Biobase::pData(x)[, clusters])
+  samples <- as.character(Biobase::pData(x)[, samples])
 
   M.theta <- sapply(unique(clusters), function(ct){
     my.rowMeans(sapply(unique(samples), function(sid){
